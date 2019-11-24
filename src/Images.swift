@@ -152,7 +152,7 @@ class ImagesVC: UIViewController
         {
             if let image = self.images[id]
             {
-                // TODO itemView.image = image
+                itemView.image = image
             }
         }
     }
@@ -160,9 +160,7 @@ class ImagesVC: UIViewController
     // MARK: - CELL
 
     private let CELL_ID = "CELL_ID"
-    // TODO
-    //private typealias CellView = ImagesItemView
-    private typealias CellView = UIView
+    private typealias CellView = UIImageView
     private typealias Cell = UICollectionViewCellTemplate<CellView>
     
     private func cell(forItemAt indexPath: IndexPath) -> UICollectionViewCell
@@ -177,9 +175,10 @@ class ImagesVC: UIViewController
         let item = self.items[index]
 
         cell.itemView.backgroundColor = .gray
+        cell.itemView.contentMode = .scaleAspectFill
+        cell.itemView.clipsToBounds = true
 
-        // TODO
-        //cell.itemView.image = self.images[index] ?? self.placeholderImage
+        cell.itemView.image = self.images[index] ?? self.placeholderImage
         self.dequeued[cell.itemView] = index
         return cell
     }
