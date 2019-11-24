@@ -16,3 +16,6 @@ I've used the following iOS libraries:
 * Cocoa Pods to get almost all of the above libraries in
 * XcodeGen to generate Xcode project
 
+# Preview
+
+![Preview](preview.gif)

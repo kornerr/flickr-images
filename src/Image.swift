@@ -10,6 +10,8 @@ class ImageVC: UIViewController
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        self.view.backgroundColor = .black
+
         self.setupImage()
 
         // Lay image out so that it's completely visible.
