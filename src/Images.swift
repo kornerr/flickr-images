@@ -5,10 +5,8 @@ import UIKit
 
 class ImagesVC: UIViewController
     ,UICollectionViewDataSource
-    //,UICollectionViewDelegate
+    ,UICollectionViewDelegate
 {
-
-    var placeholderImage: UIImage?
 
     override func viewDidLoad()
     {
@@ -19,12 +17,16 @@ class ImagesVC: UIViewController
            forCellWithReuseIdentifier: self.CELL_ID
         )
 
+        // Images.
         self.itemsChanged.subscribe { [weak self] in
             self?.downloadItemImages()
         }
         self.imagesChanged.subscribe { [weak self] in
             self?.applyItemImages()
         }
+
+        // Selection.
+        self.collectionView.delegate = self
     }
 
     override func viewDidAppear(_ animated: Bool)
@@ -128,8 +130,6 @@ class ImagesVC: UIViewController
 
     private func downloadItemImages()
     {
-        LOG("downloadItemImages")
-    
         for (id, url) in self.items.enumerated()
         {
             Alamofire.request(url).responseImage { response in
@@ -137,7 +137,7 @@ class ImagesVC: UIViewController
                 guard let image = response.result.value else { return }
     
                 DispatchQueue.main.async { [weak self] in
-                    self?.LOG("downloadItemImages finished for id: '\(id)'")
+                    //self?.LOG("downloadItemImages finished for id: '\(id)'")
                     self?.images[id] = image
                     self?.imagesChanged.report()
                 }
@@ -147,7 +147,6 @@ class ImagesVC: UIViewController
 
     private func applyItemImages()
     {
-        LOG("applyItemImages")
         for (itemView, id) in self.dequeued
         {
             if let image = self.images[id]
@@ -172,20 +171,18 @@ class ImagesVC: UIViewController
             )
             as! Cell
         let index = indexPath.row
-        let item = self.items[index]
 
         cell.itemView.backgroundColor = .gray
         cell.itemView.contentMode = .scaleAspectFill
         cell.itemView.clipsToBounds = true
 
-        cell.itemView.image = self.images[index] ?? self.placeholderImage
+        cell.itemView.image = self.images[index]
         self.dequeued[cell.itemView] = index
+        
         return cell
     }
 
-    /*
-       TODO SELECTION
-
+    // MARK: - SELECTION
 
     var selectedItemId: Int = 0
     {
@@ -195,33 +192,13 @@ class ImagesVC: UIViewController
         }
     }
     let selectedItemIdChanged = Reporter()
+
     func collectionView(
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        // Provide scale-fade animator with origin frame.
-        let cell = self.cell(forItemAt: indexPath)
-        self.scaleFadeOriginFrame = self.collectionView.convert(cell.frame, to: nil)
         self.selectedItemId = indexPath.row
     }
-    var selectedProduct: ProductsItem?
-    {
-        didSet
-        {
-            self.selectedProductChanged.report()
-        }
-    }
-    let selectedProductChanged = Reporter()
-    private func LOG(_ message: String)
-    {
-        NSLog("CatalogVC \(message)")
-    }
-    required init?(coder aDecoder: NSCoder)
-    {
-        fatalError("CatalogVC ERROR init(coder:) not implemented")
-    }
-
-    */
 }
 
 class ImagesController
