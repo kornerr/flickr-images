@@ -1,0 +1,16 @@
+name: Flickr Images
+options:
+    bundleIdPrefix: su.koren
+targets:
+    flickr-images:
+        type: application
+        platform: iOS
+        deploymentTarget: "10.0"
+        sources:
+            - path: "../src"
+              excludes:
+                - "Cfg.Staging.swift"
+                - "Outlet.storyboard"
+        settings:
+            base:
+                INFOPLIST_FILE: Info.plist
