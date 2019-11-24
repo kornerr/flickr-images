@@ -1,3 +1,4 @@
+import Anchorage
 import Alamofire
 import AlamofireImage
 import SwiftyJSON
@@ -10,6 +11,12 @@ class ImageVC: UIViewController
     {
         super.viewDidLoad()
         self.setupImage()
+
+        // Lay image out so that it's completely visible.
+        let v = startLastView(forVC: self)
+        self.imageView.topAnchor == v.bottomAnchor
+        self.imageView.widthAnchor == self.view.widthAnchor
+        finishLastView(self.imageView, forVC: self)
     }
 
     private func LOG(_ message: String)
@@ -33,7 +40,7 @@ class ImageVC: UIViewController
     private func setupImage()
     {
         self.imageView = UIImageView()
-        self.view.embeddedView = self.imageView
+        self.view.addSubview(self.imageView)
         self.imageView.backgroundColor = .black
         self.imageView.contentMode = .scaleAspectFit
 

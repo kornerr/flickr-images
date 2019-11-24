@@ -1,3 +1,4 @@
+import Anchorage
 import UIKit
 
 // MARK: - UIView.embeddedView
@@ -259,3 +260,39 @@ class UICollectionViewCellTemplate<ItemView: UIView>: UICollectionViewCell
         fatalError("UICollectionViewCellTemplate. ERROR: init(coder:) not implemented")
     }
 }
+
+// MARK: - Flexible stacking of views
+
+func startLastView(forVC vc: UIViewController) -> UIView
+{
+    // Create zero height view just to serve as the first `lastView`.
+    let view = UIView()
+    vc.view.addSubview(view)
+    view.widthAnchor == vc.view.widthAnchor
+    view.heightAnchor == 0
+
+    // Attach it to the safe area's top.
+    if #available(iOS 11.0, *)
+    {
+        view.topAnchor == vc.view.safeAreaLayoutGuide.topAnchor
+    }
+    else
+    {
+        view.topAnchor == vc.topLayoutGuide.bottomAnchor
+    }
+
+    return view
+}
+
+func finishLastView(_ view: UIView, forVC vc: UIViewController)
+{
+    if #available(iOS 11.0, *)
+    {
+        view.bottomAnchor == vc.view.safeAreaLayoutGuide.bottomAnchor
+    }
+    else
+    {
+        view.bottomAnchor == vc.bottomLayoutGuide.topAnchor
+    }
+}
+
