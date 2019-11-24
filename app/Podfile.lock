@@ -3,23 +3,27 @@ PODS:
   - AlamofireImage (3.5.2):
     - Alamofire (~> 4.8)
   - Anchorage (4.3.1)
+  - SwiftyJSON (5.0.0)
 
 DEPENDENCIES:
   - Alamofire (~> 4.8.2)
   - AlamofireImage (~> 3.5.2)
   - Anchorage (~> 4.3.1)
+  - SwiftyJSON
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - AlamofireImage
     - Anchorage
+    - SwiftyJSON
 
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   AlamofireImage: 63cfe3baf1370be6c498149687cf6db3e3b00999
   Anchorage: a187da0bc9b07440637d42c8744b8c82a4490295
+  SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 
-PODFILE CHECKSUM: f747ad7eb9564c3cf65053ace71db4aa08f80c56
+PODFILE CHECKSUM: 728e5473089af71e9f14ee4a04c693ad62fd9cb7
 
 COCOAPODS: 1.7.5

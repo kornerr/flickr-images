@@ -5,4 +5,5 @@ target 'flickr-images' do
     pod 'Anchorage', '~> 4.3.1'
     pod 'Alamofire', '~> 4.8.2'
     pod 'AlamofireImage', '~> 3.5.2'
+    pod 'SwiftyJSON' #, '~> '
 end

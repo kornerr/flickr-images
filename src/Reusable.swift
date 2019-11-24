@@ -268,3 +268,10 @@ func finishLastView(_ view: UIView, forVC vc: UIViewController)
         view.bottomAnchor == vc.bottomLayoutGuide.topAnchor
     }
 }
+
+// MARK: Construct Flickr image url string from data bits.
+
+func flickrImageURLString(forFarm farm: String, server: String, id: String, secret: String) -> String
+{
+    return "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
+}
