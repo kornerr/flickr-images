@@ -269,9 +269,29 @@ func finishLastView(_ view: UIView, forVC vc: UIViewController)
     }
 }
 
-// MARK: Construct Flickr image url string from data bits.
+// MARK: - Construct Flickr image url string from data bits.
 
 func flickrImageURLString(forFarm farm: String, server: String, id: String, secret: String) -> String
 {
     return "https://farm\(farm).staticflickr.com/\(server)/\(id)_\(secret).jpg"
+}
+
+// MARK: - Use any UIView inside a collection view cell.
+
+class UICollectionViewCellTemplate<ItemView: UIView>: UICollectionViewCell
+{
+    var itemView: ItemView!
+
+    override init(frame: CGRect)
+    {
+        super.init(frame: frame)
+        // Create and embed item view.
+        self.itemView = ItemView()
+        self.contentView.embeddedView = self.itemView
+    }
+
+    required init?(coder aDecoder: NSCoder)
+    {
+        fatalError("UICollectionViewCellTemplate. ERROR: init(coder:) not implemented")
+    }
 }

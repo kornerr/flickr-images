@@ -1,14 +1,36 @@
 import Alamofire
+import AlamofireImage
 import SwiftyJSON
 import UIKit
 
 class ImagesVC: UIViewController
+    ,UICollectionViewDataSource
+    //,UICollectionViewDelegate
 {
+
+    var placeholderImage: UIImage?
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        //self.setupWebView()
+        self.setupCollectionView()
+        self.collectionView.register(
+           Cell.self,
+           forCellWithReuseIdentifier: self.CELL_ID
+        )
+
+        self.itemsChanged.subscribe { [weak self] in
+            self?.downloadItemImages()
+        }
+        self.imagesChanged.subscribe { [weak self] in
+            self?.applyItemImages()
+        }
+    }
+
+    override func viewDidAppear(_ animated: Bool)
+    {
+        super.viewDidAppear(animated)
+        self.configureLayoutInsets()
     }
 
     private func LOG(_ message: String)
@@ -16,18 +38,191 @@ class ImagesVC: UIViewController
         NSLog("ImagesVC \(message)")
     }
 
-    // MARK: - WEB VIEW
+    // MARK: - ITEMS
+
+    var items = [String]()
+    {
+        didSet
+        {
+            self.itemsChanged.report()
+        }
+    }
+    let itemsChanged = Reporter()
+
+    // MARK: - COLLECTION VIEW
+
+    private let ITEM_INSET_MIN: CGFloat = 15
+    private let ITEM_WIDTH: CGFloat = 140
+    private let ITEM_HEIGHT: CGFloat = 140
+
+    private var collectionView: UICollectionView!
+    private var layout: UICollectionViewFlowLayout!
+
+    private func setupCollectionView()
+    {
+        self.layout = UICollectionViewFlowLayout()
+        self.collectionView =
+            UICollectionView(frame: .zero, collectionViewLayout: self.layout)
+        self.view.embeddedView = self.collectionView
+        self.collectionView.backgroundColor = .clear
+        self.collectionView.dataSource = self
+    
+        // Refresh on changes.
+        self.itemsChanged.subscribe { [weak self] in
+            self?.collectionView.reloadData()
+        }
+    
+        // Set stub size initially so that cells are invisible before changes.
+        self.layout.itemSize = CGSize(width: 1, height: 1)
+        self.itemsChanged.subscribe { [weak self] in
+            self?.configureItemSize()
+        }
+    }
+    
+    private func configureItemSize()
+    {
+        let itemSize = CGSize(width: self.ITEM_WIDTH, height: self.ITEM_HEIGHT)
+        self.layout.itemSize = itemSize
+    }
+
+    private func configureLayoutInsets()
+    {
+        // Find out the number of items fitting into single row
+        // with default insets.
+        let width = self.collectionView.frame.size.width
+        let insetWidth = width - self.ITEM_INSET_MIN * 2 /* left + right edges */
+        let itemsCount = floor(insetWidth / self.ITEM_WIDTH)
+    
+        // Find out overall free width not occupied by items.
+        let occupiedWidth = itemsCount * self.ITEM_WIDTH
+        let freeWidth = width - occupiedWidth
+        let freeSlotsCount = itemsCount + 1
+    
+        // Find out width to equalize free slots.
+        let slotWidth = freeWidth / freeSlotsCount
+        // Use this width for insets.
+        let inset = slotWidth
+        self.layout.sectionInset =
+            UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
+        return self.items.count
+    }
+    
+    func collectionView(
+       _ collectionView: UICollectionView,
+       cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        return self.cell(forItemAt: indexPath)
+    }
+
+    // MARK: - IMAGES
+
+    private var dequeued = [CellView : Int]()
+    private(set) var images = [Int : UIImage]()
+    let imagesChanged = Reporter()
+
+    private func downloadItemImages()
+    {
+        LOG("downloadItemImages")
+    
+        for (id, url) in self.items.enumerated()
+        {
+            Alamofire.request(url).responseImage { response in
+                // Make sure image exists.
+                guard let image = response.result.value else { return }
+    
+                DispatchQueue.main.async { [weak self] in
+                    self?.LOG("downloadItemImages finished for id: '\(id)'")
+                    self?.images[id] = image
+                    self?.imagesChanged.report()
+                }
+            }
+        }
+    }
+
+    private func applyItemImages()
+    {
+        LOG("applyItemImages")
+        for (itemView, id) in self.dequeued
+        {
+            if let image = self.images[id]
+            {
+                // TODO itemView.image = image
+            }
+        }
+    }
+
+    // MARK: - CELL
+
+    private let CELL_ID = "CELL_ID"
+    // TODO
+    //private typealias CellView = ImagesItemView
+    private typealias CellView = UIView
+    private typealias Cell = UICollectionViewCellTemplate<CellView>
+    
+    private func cell(forItemAt indexPath: IndexPath) -> UICollectionViewCell
+    {
+        let cell =
+            self.collectionView.dequeueReusableCell(
+                withReuseIdentifier: self.CELL_ID,
+                for: indexPath
+            )
+            as! Cell
+        let index = indexPath.row
+        let item = self.items[index]
+
+        cell.itemView.backgroundColor = .gray
+
+        // TODO
+        //cell.itemView.image = self.images[index] ?? self.placeholderImage
+        self.dequeued[cell.itemView] = index
+        return cell
+    }
 
     /*
-    private var webView: WKWebView!
+       TODO SELECTION
 
-    private func setupWebView()
+
+    var selectedItemId: Int = 0
     {
-        self.webView = WKWebView(frame: .zero, configuration: self.cfgWithCookies())
-        self.view.embeddedView = self.webView
+        didSet
+        {
+            self.selectedItemIdChanged.report()
+        }
     }
-    */
+    let selectedItemIdChanged = Reporter()
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        // Provide scale-fade animator with origin frame.
+        let cell = self.cell(forItemAt: indexPath)
+        self.scaleFadeOriginFrame = self.collectionView.convert(cell.frame, to: nil)
+        self.selectedItemId = indexPath.row
+    }
+    var selectedProduct: ProductsItem?
+    {
+        didSet
+        {
+            self.selectedProductChanged.report()
+        }
+    }
+    let selectedProductChanged = Reporter()
+    private func LOG(_ message: String)
+    {
+        NSLog("CatalogVC \(message)")
+    }
+    required init?(coder aDecoder: NSCoder)
+    {
+        fatalError("CatalogVC ERROR init(coder:) not implemented")
+    }
 
+    */
 }
 
 class ImagesController

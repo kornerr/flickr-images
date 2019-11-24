@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate
         controller.itemsChanged.subscribe { [weak self] in
             guard let items = self?.imagesController.items else { return }
             self?.LOG("Image items: '\(items)'")
-            // self?.imagesVC.items = items
+            self?.imagesVC.items = items
         }
 
         controller.refresh()
