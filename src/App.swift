@@ -64,6 +64,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate
             imagesVC.show(imageVC, sender: nil)
         }
 
+        // Refresh images.
+        self.imagesVC.refreshImages.subscribe { [weak self] in
+            self?.imagesController.refresh()
+        }
+
         // Load images the first time.
         self.imagesController.refresh()
     }

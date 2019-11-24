@@ -27,6 +27,8 @@ class ImagesVC: UIViewController
 
         // Selection.
         self.collectionView.delegate = self
+
+        self.setupRefreshImages()
     }
 
     override func viewDidAppear(_ animated: Bool)
@@ -130,6 +132,8 @@ class ImagesVC: UIViewController
 
     private func downloadItemImages()
     {
+        self.images = [ : ]
+
         for (id, url) in self.items.enumerated()
         {
             Alamofire.request(url).responseImage { response in
@@ -199,6 +203,29 @@ class ImagesVC: UIViewController
     ) {
         self.selectedItemId = indexPath.row
     }
+
+    // MARK: - REFRESH IMAGES
+
+    let refreshImages = Reporter()
+    private var refreshButton: UIBarButtonItem!
+
+    private func setupRefreshImages()
+    {
+        self.refreshButton =
+            UIBarButtonItem(
+                barButtonSystemItem: .refresh,
+                target: self,
+                action: #selector(requestRefreshImages)
+            )
+        var items: [UIBarButtonItem] = self.navigationItem.rightBarButtonItems ?? []
+        items.append(self.refreshButton)
+        self.navigationItem.rightBarButtonItems = items
+    }
+
+    @objc func requestRefreshImages(_ sender: Any)
+    {
+        self.refreshImages.report()
+    }
 }
 
 class ImagesController
@@ -211,6 +238,7 @@ class ImagesController
 
     func refresh()
     {
+        self.items = []
         self.loadItems()
     }
 
