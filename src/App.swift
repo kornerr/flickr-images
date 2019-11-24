@@ -30,12 +30,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate
     // MARK: - IMAGES
 
     private var imagesVC: ImagesVC!
+    private var imagesController: ImagesController!
     
     private func setupImages()
     {
         let vc = ImagesVC()
         self.imagesVC = vc
         vc.title = NSLocalizedString("Images.Title", comment: "")
+
+        let controller = ImagesController()
+        self.imagesController = controller
+
+        controller.itemsChanged.subscribe { [weak self] in
+            guard let items = self?.imagesController.items else { return }
+            self?.LOG("Image items: '\(items)'")
+            // self?.imagesVC.items = items
+        }
+
+        controller.refresh()
     }
 
 }

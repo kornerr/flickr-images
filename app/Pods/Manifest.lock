@@ -1,16 +1,25 @@
 PODS:
+  - Alamofire (4.8.2)
+  - AlamofireImage (3.5.2):
+    - Alamofire (~> 4.8)
   - Anchorage (4.3.1)
 
 DEPENDENCIES:
-  - Anchorage
+  - Alamofire (~> 4.8.2)
+  - AlamofireImage (~> 3.5.2)
+  - Anchorage (~> 4.3.1)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - AlamofireImage
     - Anchorage
 
 SPEC CHECKSUMS:
+  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
+  AlamofireImage: 63cfe3baf1370be6c498149687cf6db3e3b00999
   Anchorage: a187da0bc9b07440637d42c8744b8c82a4490295
 
-PODFILE CHECKSUM: 64572bea91d75c0598f012713f626c72e8498ebc
+PODFILE CHECKSUM: f747ad7eb9564c3cf65053ace71db4aa08f80c56
 
 COCOAPODS: 1.7.5
